@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import Boom from 'boom';
 
 dotenv.config()
 
@@ -18,23 +19,12 @@ export const genToken = (username) => ({
 const parseAuthorization = (authorization) =>
     authorization !== null ? authorization.replace('Bearer ', '') : null;
 
-const validAuthorization = (authorization, req, res) => {
+const validAuthorization = (authorization, h) => {
     const token = parseAuthorization(authorization);
     if (token !== null) {
         return jwt.verify(token, process.env.JWT_SIGN_SECRET, (err) => {
             if (err) {
-                if (err.name === 'TokenExpiredError') {
-                    res.status(401).json({
-                        "message": err.message,
-                    });
-                } else {
-                    res
-                        .status(403)
-                        .json({
-                            "message": "Wrong token",
-                        });
-                }
-                return false;
+                throw Boom.unauthorized();
             }
             return true;
         });
@@ -42,10 +32,10 @@ const validAuthorization = (authorization, req, res) => {
     return false;
 };
 
-export const getTokenAndValidAccess = (req, res, next) => {
-    const headerAuth = req.headers.authorization;
-    const validation = validAuthorization(headerAuth, req, res);
+export const getTokenAndValidAccess = (request, h) => {
+    const headerAuth = request.headers.authorization;
+    const validation = validAuthorization(headerAuth, h);
     if (validation) {
-        next();
+        return h.continue;
     }
 };

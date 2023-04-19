@@ -1,24 +1,51 @@
-import dotenv from 'dotenv'
-import express from 'express'
+import dotenv from 'dotenv';
+import Hapi from '@hapi/hapi';
+import axios from 'axios';
 
-import loginRouter from './utils/login.utils.js'
+import {login} from './utils/login.utils.js';
 import {getTokenAndValidAccess} from './utils/token.utils.js';
 
-dotenv.config()
+dotenv.config();
 
-const app = express()
-const port = process.env.PORT || 3000;
-
-app.use(express.json())
-
-app.use(loginRouter)
-
-app.use(getTokenAndValidAccess)
-
-app.get('/', (req, res) => {
-    res.send('Hello World!')
+const server = Hapi.server({
+    port: process.env.PORT || 3000,
 });
 
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+server.route({
+    method: 'POST',
+    path: '/login',
+    handler: login,
 })
+
+server.route({
+    method: 'GET',
+    path: '/starwars/{characterId}',
+    handler: async (request, h) => {
+        const apiUrl = `https://swapi.dev/api/people/${request.params.characterId}`;
+        const {data} = await axios.get(apiUrl);
+        return data;
+    },
+    options: {
+        pre: [
+            {method: getTokenAndValidAccess}
+        ]
+    }
+});
+
+server.route({
+    method: '*',
+    path: '/{any*}',
+    options: {
+        auth: false,
+    },
+    handler: (request, h) => {
+        return '404 Error: Page Not Found';
+    }
+});
+
+const start = async () => {
+    await server.start();
+    console.log(`Server running at: ${server.info.uri}`);
+};
+
+start();
