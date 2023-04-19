@@ -19,7 +19,7 @@ export const genToken = (username) => ({
 const parseAuthorization = (authorization) =>
     authorization !== null ? authorization.replace('Bearer ', '') : null;
 
-const validAuthorization = (authorization, h) => {
+const validAuthorization = (authorization) => {
     const token = parseAuthorization(authorization);
     if (token !== null) {
         return jwt.verify(token, process.env.JWT_SIGN_SECRET, (err) => {
@@ -34,7 +34,7 @@ const validAuthorization = (authorization, h) => {
 
 export const getTokenAndValidAccess = (request, h) => {
     const headerAuth = request.headers.authorization;
-    const validation = validAuthorization(headerAuth, h);
+    const validation = validAuthorization(headerAuth);
     if (validation) {
         return h.continue;
     }

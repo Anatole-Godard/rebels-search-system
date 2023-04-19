@@ -20,7 +20,7 @@ server.route({
 server.route({
     method: 'GET',
     path: '/starwars/{characterId}',
-    handler: async (request, h) => {
+    handler: async (request) => {
         const apiUrl = `https://swapi.dev/api/people/${request.params.characterId}`;
         const {data} = await axios.get(apiUrl);
         return data;
@@ -38,7 +38,7 @@ server.route({
     options: {
         auth: false,
     },
-    handler: (request, h) => {
+    handler: () => {
         return '404 Error: Page Not Found';
     }
 });
