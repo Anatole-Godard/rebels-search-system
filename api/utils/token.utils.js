@@ -4,8 +4,7 @@ import Boom from 'boom';
 
 dotenv.config()
 
-export const genToken = (username) => ({
-    mainToken: jwt.sign(
+export const genToken = (username) => (jwt.sign(
         {
             user: username,
         },
@@ -13,8 +12,8 @@ export const genToken = (username) => ({
         {
             expiresIn: '1h',
         }
-    ),
-});
+    )
+);
 
 const parseAuthorization = (authorization) =>
     authorization !== null ? authorization.replace('Bearer ', '') : null;

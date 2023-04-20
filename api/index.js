@@ -1,14 +1,21 @@
 import dotenv from 'dotenv';
 import Hapi from '@hapi/hapi';
-import axios from 'axios';
 
 import {login} from './utils/login.utils.js';
 import {getTokenAndValidAccess} from './utils/token.utils.js';
+import {fetchCharacter} from "./utils/swapi.utils.js";
 
 dotenv.config();
 
 const server = Hapi.server({
     port: process.env.PORT || 3000,
+    routes: {
+        "cors": {
+            "origin": ["*"],
+            "headers": ["Accept", "Content-Type", "Authorization"],
+            "additionalHeaders": ["X-Requested-With"]
+        }
+    }
 });
 
 server.route({
@@ -19,11 +26,13 @@ server.route({
 
 server.route({
     method: 'GET',
-    path: '/starwars/{characterId}',
-    handler: async (request) => {
-        const apiUrl = `https://swapi.dev/api/people/${request.params.characterId}`;
-        const {data} = await axios.get(apiUrl);
-        return data;
+    path: '/starwars',
+    handler: async () => {
+        return await fetchCharacter().then((response) => {
+            return response;
+        }).catch((error) => {
+            return error;
+        });
     },
     options: {
         pre: [

@@ -6,7 +6,6 @@ dotenv.config()
 
 const usernameStored = process.env.API_USERNAME;
 const passwordStored = process.env.API_PASSWORD;
-console.log(usernameStored, passwordStored)
 
 export const login = (request, h) => {
     const {username, password} = request.payload;
