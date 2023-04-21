@@ -17,9 +17,17 @@ export const UserProvider = ({children}) => {
         handleAccessTokenChange();
     }, [token]);
 
-    return (<UserContext.Provider value={{token, setToken}}>
-        {children}
-    </UserContext.Provider>);
+    return (
+        <UserContext.Provider value={{token, setToken}}>
+            {children}
+        </UserContext.Provider>
+    );
 }
 
-export const useUser = () => useContext(UserContext);
+interface UserContextType {
+    token: string | null,
+    setToken: (token: string | null) => void
+}
+
+export const useUser = () => useContext(UserContext) as UserContextType;
+

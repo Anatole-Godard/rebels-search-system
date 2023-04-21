@@ -1,23 +1,23 @@
-import {useState} from "react";
+import React, {useState} from "react";
 import {useUser} from "../hooks/UseAuth";
 import axios from "axios";
-import "./login.css"
+import styles from "./Login.module.scss";
 import {useNavigate} from "react-router-dom";
 
-const baseApiUrl = process.env.REACT_APP_NODE_API_URL
+const baseApiUrl = import.meta.env.VITE_NODE_API_URL
 export const Login = () => {
     const {setToken} = useUser();
     const navigate = useNavigate();
 
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [username, setUsername] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
 
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleEmailChange = (e) => setUsername(e.target.value);
-    const handlePasswordChange = (e) => setPassword(e.target.value);
+    const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value);
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (username && password) {
             axios.post(`${baseApiUrl}/login`, {username, password}).then((response) => {
@@ -33,34 +33,34 @@ export const Login = () => {
     }
 
     return (
-        <div className="container">
+        <div className={styles.container}>
             <h1>Connexion</h1>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="username">Nom d'utilisateur</label>
+            <form className={styles.form} onSubmit={handleSubmit}>
+                <div className={styles.formGroup}>
+                    <label className={styles.label} htmlFor="username">Nom d'utilisateur</label>
                     <input id="username" name="username"
                            type="username"
-                           className={error !== null && !username ? "input-error" : ""}
+                           className={error !== null && !username ? styles.inputError : ""}
                            autoComplete="username"
                            autoFocus
                            onChange={handleEmailChange}
                            value={username}
                     ></input>
                 </div>
-                <div className="form-group">
+                <div className={styles.formGroup}>
                     <label htmlFor="password">Mot de passe</label>
                     <input
                         id="password"
                         name="password"
                         type="password"
-                        className={error !== null && !password ? "input-error" : ""}
+                        className={error !== null && !password ? styles.inputError : ""}
                         autoComplete="password"
                         onChange={handlePasswordChange}
                         value={password}
                     ></input>
                 </div>
-                {error !== null && <div className="error">{error}</div>}
-                <button className="submit" type="submit">
+                {error !== null && <div className={styles.error}>{error}</div>}
+                <button className={styles.button} type="submit">
                     Se connecter
                 </button>
             </form>

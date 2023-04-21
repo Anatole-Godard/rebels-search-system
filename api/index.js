@@ -3,7 +3,7 @@ import Hapi from '@hapi/hapi';
 
 import {login} from './utils/login.utils.js';
 import {getTokenAndValidAccess} from './utils/token.utils.js';
-import {fetchCharacter} from "./utils/swapi.utils.js";
+import {fetchCharacter, fetchCharacters} from "./utils/swapi.utils.js";
 
 dotenv.config();
 
@@ -27,8 +27,29 @@ server.route({
 server.route({
     method: 'GET',
     path: '/starwars',
-    handler: async () => {
-        return await fetchCharacter().then((response) => {
+    handler: async (request) => {
+        const type = request.query?.type || 'people';
+        const search = request.query?.search;
+        return await fetchCharacters(type, search).then((response) => {
+            return response;
+        }).catch((error) => {
+            return error;
+        });
+    },
+    options: {
+        pre: [
+            {method: getTokenAndValidAccess}
+        ]
+    }
+});
+
+server.route({
+    method: 'GET',
+    path: '/starwars/{type}/{id}',
+    handler: async (request) => {
+        const id = request.params.id;
+        const type = request.params.type;
+        return await fetchCharacter(type, id).then((response) => {
             return response;
         }).catch((error) => {
             return error;
